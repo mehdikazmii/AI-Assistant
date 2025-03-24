@@ -16,14 +16,32 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // final _isDarkMode = Pref.isDarkMode.obs;
   final _isDarkMode = Get.isDarkMode.obs; //bug fix
+  bool _isAdLoaded = false;
 
   @override
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     Pref.showOnboarding = false;
+    _loadAd();
+  }
+
+  @override
+  void dispose() {
+    // Clean up any resources if needed
+    super.dispose();
+  }
+
+  Future<void> _loadAd() async {
+    try {
+      // The ad will be loaded automatically when the widget is created
+      setState(() {
+        _isAdLoaded = true;
+      });
+    } catch (e) {
+      print('Error loading ad: $e');
+    }
   }
 
   @override
@@ -38,28 +56,32 @@ class _HomeScreenState extends State<HomeScreen> {
       //app bar
       appBar: AppBar(
         title: const Text(appName),
-
-        //
-        actions: [
-          IconButton(
-              padding: const EdgeInsets.only(right: 10),
-              onPressed: () {
-                Get.changeThemeMode(
-                    _isDarkMode.value ? ThemeMode.light : ThemeMode.dark);
-
-                _isDarkMode.value = !_isDarkMode.value;
-                Pref.isDarkMode = _isDarkMode.value;
-              },
-              icon: Obx(() => Icon(
-                  _isDarkMode.value
-                      ? Icons.brightness_2_rounded
-                      : Icons.brightness_5_rounded,
-                  size: 26)))
-        ],
       ),
 
       //ad
-      bottomNavigationBar: AdHelper.nativeBannerAd(),
+      bottomNavigationBar: _isAdLoaded ? AdHelper.nativeBannerAd() : null,
+      // ... existing code ...
+      //floating action button for theme switching
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: _isDarkMode.value
+            ? Colors.white.withOpacity(0.2)
+            : Colors.black.withOpacity(0.1),
+        elevation: 0,
+        onPressed: () {
+          Get.changeThemeMode(
+              _isDarkMode.value ? ThemeMode.light : ThemeMode.dark);
+          _isDarkMode.value = !_isDarkMode.value;
+          Pref.isDarkMode = _isDarkMode.value;
+        },
+        child: Obx(() => Icon(
+            _isDarkMode.value
+                ? Icons.brightness_2_rounded
+                : Icons.brightness_5_rounded,
+            size: 26,
+            // color: Get.isDarkMode ? Colors.black87 : Colors.white)),
+            color: _isDarkMode.value ? Colors.white : Colors.black87)),
+      ),
+// ... existing code ...
 
       //body
       body: ListView(
