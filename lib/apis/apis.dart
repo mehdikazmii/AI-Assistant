@@ -5,15 +5,15 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:http/http.dart';
 import 'package:translator_plus/translator_plus.dart';
 
+import '../config/api_config.dart';
+
 class APIs {
   //get answer from google gemini ai
   static Future<String> getAnswer(String question) async {
     try {
-      log('api key: AIzaSyDLHyyzjqAqW4-k5FtzL0qRo8zOxrRICgI');
-
       final model = GenerativeModel(
-        model: 'gemini-1.5-flash-latest',
-        apiKey: 'AIzaSyDLHyyzjqAqW4-k5FtzL0qRo8zOxrRICgI',
+        model: 'gemini-2.0-flash',
+        apiKey: ApiConfig.geminiApiKey,
         generationConfig: GenerationConfig(
           temperature: 0.7,
           topK: 40,
@@ -93,13 +93,11 @@ class APIs {
 
   static Future<List<String>> searchAiImages(String prompt) async {
     try {
-      // Using Unsplash API
       final res = await get(
         Uri.parse(
             'https://api.unsplash.com/search/photos?query=$prompt&per_page=30'),
         headers: {
-          'Authorization':
-              'Client-ID BdmOGX-N-0RqIQTKSymz9F27Io3_sP5Ew9r1lBPq8hE', // You'll need to replace this with your Unsplash API key
+          'Authorization': 'Client-ID ${ApiConfig.unsplashApiKey}',
         },
       );
 
